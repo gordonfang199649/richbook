@@ -10,6 +10,9 @@
       ref="formRef"
       label-width="80px"
     >
+     <!-- 
+       el-form-item  prop 屬性一定打，否則驗證不會生效
+      -->
       <el-form-item
         label="金額"
         prop='dollar'
@@ -102,8 +105,10 @@
     },
     emits: ['update:showDialog'],
     setup(props, { emit }) {
+      // showDialog 子元件-控制是否顯示對話視窗
       const dialogFormVisible = ref(false)
       const formRef = ref(null)
+      // form 表單資料
       const form = reactive({
         dollar: 0,
         type: '',
@@ -111,6 +116,7 @@
         account: '',
         date: '',
       })
+      //表單驗證規則
       const rules = {
         dollar: [
           { required: true, message: '請輸入金額', trigger: 'blur' },
@@ -121,23 +127,32 @@
         date: [{ required: true, message: '請選擇日期', trigger: 'blur' }],
       }
 
+      /**
+       * 監控屬性props.showDialog
+       * 一旦有異動，並刷新表單內的資料
+       */
       watch(
         () => props.showDialog,
         (newValue) => {
           if (newValue) {
+            console.log('newValue')
+            console.log(newValue)
             dialogFormVisible.value = true
             form.dollar = 0
             form.type = ''
             form.title = ''
             form.account = ''
             form.date = props.selectedDate
-
             console.log('watch')
             console.log(form)
           }
         }
       )
 
+      /**
+       * 處理表單送出後的動作
+       *
+       */
       const handleSubmit = async () => {
         const formReference = unref(formRef)
         console.log('form')
@@ -145,20 +160,30 @@
 
         if (!formReference) return
         try {
+          //表單驗證是非同步(回傳Promise)，使用async搭配await
           await formReference.validate()
           const { dollar, type, title, account, date } = form
           console.log(dollar, type, title, account, date)
+          //驗證通過後即關閉視窗
           handleClose()
         } catch (err) {
+          //驗證失敗對話視窗會顯示錯誤的欄位，並不關閉視窗
           console.log(err)
           console.log('請重新填寫')
         }
       }
 
+      /**
+       * 處理關閉視窗的動作- 控制視窗設為false
+       *
+       */
       const handleClose = () => {
         const form = unref(formRef)
+        //復原表單初始狀態，驗證失敗的提示訊息會清除
         form.resetFields()
+        //設定表單顯示關閉
         dialogFormVisible.value = false
+        //回傳給父元件
         emit('update:showDialog', false)
       }
 
