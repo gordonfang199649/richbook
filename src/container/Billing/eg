@@ -1,0 +1,103 @@
+<template>
+  <el-dialog
+    title="新增紀錄"
+    v-model="dialogFormVisible"
+    @close="handleClose"
+  >
+    <el-form
+      ref="loginFormRef"
+      :model="loginFormModel"
+      :rules="rules"
+    >
+      <el-form-item prop="username">
+        <el-input
+          v-model="loginFormModel.username"
+          placeholder="帳號"
+        />
+      </el-form-item>
+      <el-form-item prop="password">
+        <el-input
+          v-model="loginFormModel.password"
+          type="password"
+          placeholder="密碼"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button
+          type="primary"
+          @click="handleSubmit"
+        >
+          Login
+        </el-button>
+      </el-form-item>
+    </el-form>
+  </el-dialog>
+</template>
+
+<script>
+  import { defineComponent, watch, ref, reactive, unref } from 'vue'
+
+  export default defineComponent({
+    props: {
+      showDialog: {
+        type: Boolean,
+        default: false,
+        required: true,
+      },
+      selectedDate: {
+        type: String,
+        default: '',
+        required: true,
+      },
+    },
+    emits: ['update:showDialog'],
+    setup(props, { emit }) {
+      const dialogFormVisible = ref(false)
+      const loginFormModel = reactive({ username: '', password: '' })
+      const loginFormRef = ref(null)
+      const rules = {
+        username: [{ required: true, message: '请输入帳號', trigger: 'blur' }],
+        password: [{ required: true, message: '请输入密碼', trigger: 'blur' }],
+      }
+
+      watch(
+        () => props.showDialog,
+        (newValue) => {
+          if (newValue) {
+            dialogFormVisible.value = true
+            console.log(props.showDialog)
+          }
+        }
+      )
+
+      const handleSubmit = async () => {
+        const form = unref(loginFormRef)
+        if (!form) return
+        try {
+          await form.validate()
+          const { username, password } = loginFormModel
+          console.log(username, password)
+          handleClose()
+        } catch (error) {
+          console.log(error)
+        }
+      }
+
+      const handleClose = async () => {
+        const form = unref(loginFormRef)
+        console.log(loginFormRef)
+        console.log(form)
+        await form.resetFields()
+        loginFormModel.username = ''
+        loginFormModel.password = ''
+        dialogFormVisible.value = false
+        emit('update:showDialog', false)
+      }
+
+      return { dialogFormVisible, rules, loginFormModel, loginFormRef, handleSubmit, handleClose }
+    },
+  })
+</script>
+
+<style>
+</style>
