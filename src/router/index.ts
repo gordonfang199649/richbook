@@ -1,31 +1,35 @@
 import { createRouter, createWebHistory } from "vue-router";
-
+import Layout from '@/layout/Layout.vue';
 const routes = [
   {
     path: "/",
-    name: "home",
-    component: () => import("@/views/Home.vue"),
+    name: "root",
+    redirect: { name: "main" },
+  },
+  {
+    path: "/main",
+    name: "main",
+    component: Layout,
     redirect: { name: "billing" },
-    children: [
-      {
-        path: "/billing",
-        name: "billing",
-        component: () => import("@/views/Billing/index.vue"),
-        meta: { title: "月記帳本", icon: "el-icon-notebook-1" },
-      },
-      {
-        path: "/account",
-        name: "account",
-        component: () => import("@/views/Account.vue"),
-        meta: { title: "帳戶管理", icon: "el-icon-money" },
-      },
-      {
-        path: "/charts",
-        name: "charts",
-        component: () => import("@/views/Charts.vue"),
-        meta: { title: "圖表分析", icon: "el-icon-pie-chart" },
-      },
-    ],
+    children: [{
+      path: "/billing",
+      name: "billing",
+      meta: { title: "月記帳本", icon: "el-icon-notebook-1" },
+      component: () => import('@/views/Billing/index.vue')
+    }
+    ]
+  },
+  {
+    path: "/account",
+    name: "account",
+    component: () => import("@/views/Account.vue"),
+    meta: { title: "帳戶管理", icon: "el-icon-money" },
+  },
+  {
+    path: "/charts",
+    name: "charts",
+    component: () => import("@/views/Charts.vue"),
+    meta: { title: "圖表分析", icon: "el-icon-pie-chart" },
   },
 ];
 
